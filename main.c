@@ -42,10 +42,18 @@ void drawMainMenu() {
     printf("%sВыход\n", drawTableMenuArrow(6));
 }
 
+void doMenuAction(int n)
+{
+
+    switch (n)
+    {
+        case 6: exit(0); break;
+    }
+}
 
 void processMainMenu() {
     int k = 0;
-    char c1 = 0;
+    int c1 = 0;
     ActiveItem = 1;
     while (k != 1) {
         clearScreen();
@@ -63,7 +71,7 @@ void processMainMenu() {
                 if (ActiveItem < MAX_MAINMENU)
                     ActiveItem++;
                 break;
-                //case KEY_ENTER: break;
+            case KEY_ENTER: doMenuAction(ActiveItem); break;
         }
     }
 
