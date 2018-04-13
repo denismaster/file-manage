@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <conio.h>
+#include "os_types.h"
 
 //Код клавиши ввверх
 #define KEY_UP 72
