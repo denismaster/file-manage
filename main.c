@@ -23,7 +23,7 @@ extern int remove_list_elem(List_p, int);
 extern void invprint_list(List_p);
 
 //Напечатать список в обратном порядке
-extern void insertion_sort(List_p);
+extern void bubbleSort(List_p);
 
 //Сортировка выбором списка
 void exchange(Lnode_p, Lnode_p);
@@ -103,7 +103,7 @@ init_tree(Tree_p root, char *file_name, int *state) {
         i = 0;
         for (token = strtok(s, " "); token != NULL; token = strtok(NULL, " ")) {
             if (i < PCOUNT)
-                *(buf + i++) = strdup(token);
+                *(buf + i++) = _strdup(token);
         }
         if (i <= PCOUNT) {
             data = (Data_p) malloc(sizeof(Data));
@@ -113,8 +113,8 @@ init_tree(Tree_p root, char *file_name, int *state) {
             data->type = token != NULL ? token : "none";
             data->date = *(buf + 1);
             data->mod = *(buf + 2);
-            data->size = atoi(*(buf + 3));
-            data->treat = atoi(*(buf + 4));
+            data->size = (unsigned int) atoi(*(buf + 3));
+            data->treat = (unsigned int) atoi(*(buf + 4));
             root = add_tnode(root, data);
             *state = 1;
         }
@@ -180,7 +180,8 @@ my_delete_tnode(Tree_root_p root, char *key) {
         result = 1;
     }
     return result;
-} /*search function search by char *key in Tree_p tree*/ Data_p search_tnode(Tree_p node, char *key) {
+} /*search function search by char *key in Tree_p tree*/
+Data_p search_tnode(Tree_p node, char *key) {
     int cond, stop;
     stop = 0;
     Tree_p tmp = node;
@@ -189,7 +190,8 @@ my_delete_tnode(Tree_root_p root, char *key) {
         else if (cond > 0)tmp = tmp->right; else stop = 1;
     }
     return tmp == NULL ? NULL : tmp->info;
-} /*Считывание узла с клавиатуры и его добавление*/ Tree_p read_tnode(Tree_p root, int *state) {
+} /*Считывание узла с клавиатуры и его добавление*/
+Tree_p read_tnode(Tree_p root, int *state) {
     Data_p data;
     char s[LINESIZE];
     char *token;
@@ -250,7 +252,7 @@ int main(int argc, char **argv) {
             }
             case 'p': {
                 if (loaded) {
-                    printf("Прямой обход дерева:\n"); //Заменить на концевой
+                    printf("Концевой обход дерева:\n"); //Заменить на концевой
                     //
                     printf("Name:\t\tType:\tDate:\t\tMod:\t\tSize:\tTreat:\n");
                     print_tree(troot->root);
@@ -261,7 +263,7 @@ int main(int argc, char **argv) {
                 if (loaded) {
                     list = (List_p) malloc(sizeof(List));
                     infix_travers(troot->root, list);
-                    insertion_sort(list);
+                    bubbleSort(list);
                     printf("Список файлов сортированный по размеру:\n"); //попробывать по имени
                     print_list(list);
                 } else printf("Необходимо загрузить список файлов с помощью 'l'.\n");
@@ -277,8 +279,7 @@ int main(int argc, char **argv) {
                     scanf("%s", line);
                     data = search_tnode(troot->root, line);
                     if (data != NULL) print_search_data(data); else printf("Файл не найден.\n");
-                }
-                else printf("Необходимо загрузить список файлов с помощью 'l'.\n");
+                } else printf("Необходимо загрузить список файлов с помощью 'l'.\n");
                 break;
             case 'h':
                 print_help();
@@ -297,8 +298,8 @@ int main(int argc, char **argv) {
 
 void print_help() {
     static char *help[] = {"\nВозможные операции:", "l - загрузить файл в дерево", "a - добавить узел в дерево",
-                           "r - удалить элемент из дерева", "p - напечатать прямой обход дерева",
-                           "s - сортировка по размеру", "f - найти элемент по ключу", "q - выйти",
+                           "r - удалить элемент из дерева", "p - напечатать концевой обход дерева",
+                           "s - сортировка обменами по размеру", "f - найти элемент по ключу", "q - выйти",
                            "h - вывод этого сообщения"};
     int i;
     for (i = 0; i < 9; i++) printf("%s\n", *(help + i));
@@ -312,8 +313,7 @@ add_to_list(List_p list, Data_p data) {
         list->head->prev = list->head;
         list->head->info = data;
         list->size = 0;
-    }
-    else {
+    } else {
         tmp = (Lnode_p) malloc(sizeof(Lnode));
         tmp->info = data;
         tmp->next = list->head;
@@ -322,7 +322,8 @@ add_to_list(List_p list, Data_p data) {
         tmp->prev->next = tmp;
         list->size++;
     }
-} /*Функция печатает список  * List_p лист ссылка на голову списка  */ extern void print_list(List_p list) {
+} /*Функция печатает список  * List_p лист ссылка на голову списка  */
+extern void print_list(List_p list) {
     Lnode_p tmp = list->head->next;
     int i;
     print_data(list->head->info);
@@ -330,8 +331,8 @@ add_to_list(List_p list, Data_p data) {
         print_data(tmp->info);
         tmp = tmp->next;
     }
-} /*Функция удаляет i-ый элемент из списка  *List_p list- ссылка на список  *int number - номер удаляемого элемента  * если элемент удален возращает - 0, иначе 1;  */ int
-remove_list_elem(List_p list, int number) {
+} /*Функция удаляет i-ый элемент из списка  *List_p list- ссылка на список  *int number - номер удаляемого элемента  * если элемент удален возращает - 0, иначе 1;  */
+int remove_list_elem(List_p list, int number) {
     Lnode_p node_cur = list->head;
     Lnode_p node_prev = NULL;
     int state = NODELETED;
@@ -344,8 +345,7 @@ remove_list_elem(List_p list, int number) {
         if (node_prev != NULL) {
             node_prev->next = node_cur->next;
             node_cur->next->prev = node_prev;
-        }
-        else {
+        } else {
             list->head->prev = list->head->next;
             list->head = list->head->next;
         }
@@ -354,7 +354,8 @@ remove_list_elem(List_p list, int number) {
         state = DELETED;
     }
     return state;
-}  /*Функция выводит список List_p list в концевом порядке*/ void invprint_list(List_p list) {
+}  /*Функция выводит список List_p list в концевом порядке*/
+void invprint_list(List_p list) {
     Lnode_p tmp = list->head->prev;
     int i;
     for (i = list->size; tmp != list->head; i--) {
@@ -364,21 +365,18 @@ remove_list_elem(List_p list, int number) {
     print_data(list->head->info);
 }
 
-extern void insertion_sort(List_p list) {
-    Lnode_p cur, proc;
-    int state = 1;
-    Data_p key;
-    for (cur = list->head->next; cur != list->head; cur = cur->next) {
-        key = cur->info;
-        proc = cur->prev;
-        while (state == 1 && proc->info->size > key->size) {
-            proc->next->info = proc->info;
-            proc = proc->prev;
-            if (proc->next == list->head) state = 0;
-        }
-        proc->next->info = key;
-        state = 1;
-    }
+void bubbleSort(List_p list) {
+    Data_p temp;
+    Lnode_p head = list->head; // связанный список
+    Lnode_p node, node2;
+
+    for (node = head; node; node = node->next)
+        for (node2 = head; node2; node2 = node2->next)
+            if (node->info->size > node2->info->size) { // если число из node меньше числа из node2 то переставляем их
+                temp = node->info;
+                node->info = node2->info;
+                node2->info = temp;
+            }
 }
 
 void print_search_data(Data_p data) {
