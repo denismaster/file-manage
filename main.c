@@ -35,7 +35,7 @@ void print_help();
 Tree_p add_tnode(Tree_p, Data_p);
 
 //добавление узла к дереву
-void print_tree(Tree_p);
+void printTree(Tree_p);
 
 //вывод содержимого дерева
 void infix_travers(Tree_p, List_p);
@@ -68,12 +68,13 @@ Tree_p add_tnode(Tree_p node, Data_p data) {
         node->left = add_tnode(node->left, data);
     else node->right = add_tnode(node->right, data);
     return node;
-} /* Фунуция выводит инфу дерева обходя концевым обходом  * Tree_p node - указатель на корень дерева*/ void
-print_tree(Tree_p node) {
+
+} /* Фунуция выводит инфу дерева обходя прямым обходом  * Tree_p node - указатель на корень дерева*/
+void printTree(Tree_p node) {
     if (node != NULL) {
         print_data(node->info);
-        print_tree(node->left);
-        print_tree(node->right);
+        printTree(node->left);
+        printTree(node->right);
     }
 }
 
@@ -103,7 +104,7 @@ init_tree(Tree_p root, char *file_name, int *state) {
         i = 0;
         for (token = strtok(s, " "); token != NULL; token = strtok(NULL, " ")) {
             if (i < PCOUNT)
-                *(buf + i++) = _strdup(token);
+                *(buf + i++) = strdup(token);
         }
         if (i <= PCOUNT) {
             data = (Data_p) malloc(sizeof(Data));
@@ -252,10 +253,10 @@ int main(int argc, char **argv) {
             }
             case 'p': {
                 if (loaded) {
-                    printf("Концевой обход дерева:\n"); //Заменить на концевой
+                    printf("Прямой обход дерева:\n");
                     //
                     printf("Name:\t\tType:\tDate:\t\tMod:\t\tSize:\tTreat:\n");
-                    print_tree(troot->root);
+                    printTree(troot->root);
                 } else printf("Необходимо загрузить список файлов с помощью 'l'.\n");
                 break;
             }
@@ -298,7 +299,7 @@ int main(int argc, char **argv) {
 
 void print_help() {
     static char *help[] = {"\nВозможные операции:", "l - загрузить файл в дерево", "a - добавить узел в дерево",
-                           "r - удалить элемент из дерева", "p - напечатать концевой обход дерева",
+                           "r - удалить элемент из дерева", "p - напечатать прямой обход дерева",
                            "s - сортировка обменами по размеру", "f - найти элемент по ключу", "q - выйти",
                            "h - вывод этого сообщения"};
     int i;
