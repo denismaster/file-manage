@@ -55,10 +55,10 @@ void bubbleSort(List_p); //Сортировка вставками списка
 void invprint_list(List_p); //Напечатать список в обратном порядке
 /* Конец объявления функций для списков */
 /*Функции для раюоты с деревом*/
-Tree_p add_tnode(Tree_p, Data_p); //добавление узла к дереву
+Tree_p addTreeNode(Tree_p, Data_p); //добавление узла к дереву
 void printTree(Tree_p); //вывод содержимого дерева
-void infix_travers(Tree_p, List_p); //обход дерева и доавлени инфы в список
-Tree_p init_tree(Tree_p, char *, int *); //считывает файл со списком файлов
+void traverseTree(Tree_p, List_p); //обход дерева и доавлени инфы в список
+Tree_p initFromFile(Tree_p, char *, int *); //считывает файл со списком файлов
 void destroy_tnode(Tree_p); // освобождение памяти выделеной под узел
 int my_delete_tnode(Tree_root_p, char *); // удаление заданного узала из дерева
 Data_p search_tnode(Tree_p, char *); //поиск значения по ключу

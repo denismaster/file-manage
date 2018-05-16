@@ -32,16 +32,16 @@ void exchange(Lnode_p, Lnode_p);
 void print_help();
 
 //вывести подсказку
-Tree_p add_tnode(Tree_p, Data_p);
+Tree_p addTreeNode(Tree_p, Data_p);
 
 //добавление узла к дереву
 void printTree(Tree_p);
 
 //вывод содержимого дерева
-void infix_travers(Tree_p, List_p);
+void traverseTree(Tree_p, List_p);
 
 //обход дерева и доавлени инфы в список
-Tree_p init_tree(Tree_p, char *, int *);
+Tree_p initFromFile(Tree_p, char *, int *);
 
 //считывает файл со списком файлов
 void free_tnode(Tree_p);
@@ -57,19 +57,47 @@ Tree_p read_tnode(Tree_p root, int *state);
 
 void print_search_data(Data_p);
 
-Tree_p add_tnode(Tree_p node, Data_p data) {
+int readLine(char *buff, int size, FILE *fp) {
+    buff[0] = '\0';
+    buff[size - 1] = '\0';             /* mark end of buffer */
+    char *tmp;
+
+    if (fgets(buff, size, fp) == NULL) {
+        *buff = '\0';                   /* EOF */
+        return 0;
+    } else {
+        /* remove newline */
+        if ((tmp = strrchr(buff, '\n')) != NULL) {
+            *tmp = '\0';
+        }
+    }
+    return 1;
+}
+
+Tree_p addTreeNode(Tree_p node, Data_p data) {
     int cond;
+    printf("starting adding node\n");
     if (node == NULL) {
+        printf("node is null, allocate memory\n");
         node = (Tree_p) malloc(sizeof(Tree));
         node->info = data;
         node->left = node->right = NULL;
-    } else if ((cond = strcmp(data->name, node->info->name)) == 0) {}
-    else if (cond < 0)
-        node->left = add_tnode(node->left, data);
-    else node->right = add_tnode(node->right, data);
-    return node;
+    } else {
+        printf("node is not null\n");
 
-} /* Фунуция выводит инфу дерева обходя прямым обходом  * Tree_p node - указатель на корень дерева*/
+        cond = strcmp(data->name, node->info->name);
+        printf("condition:%d\n", cond);
+        if (cond < 0)
+            node->left = addTreeNode(node->left, data);
+        else
+            node->right = addTreeNode(node->right, data);
+    }
+    return node;
+}
+
+/* Фунуция выводит инфу дерева обходя концевым обходом
+ * Tree_p node - указатель на корень дерева
+ */
 void printTree(Tree_p node) {
     if (node != NULL) {
         print_data(node->info);
@@ -78,16 +106,22 @@ void printTree(Tree_p node) {
     }
 }
 
-//printf("Name: %s; Type: %s; Date: %s; Mod: %s; Size: %u; Treat: %u\n"
-// /*функция обхода конченного дерева 	 * *и добавления результата в список*/
-void infix_travers(Tree_p node, List_p list) {
+/* функция обхода дерева
+ * и добавления результата в списо
+ */
+void traverseTree(Tree_p node, List_p list) {
     if (node != NULL) {
         add_to_list(list, node->info);
-        infix_travers(node->left, list);
-        infix_travers(node->right, list);
+        traverseTree(node->left, list);
+        traverseTree(node->right, list);
     }
-} /* Считываниет файл с именем file_name  * и записывает в дерево находящееся по указателю Tree_p  * формат файла:  * <имя> <тип> <дата создания> <последняя модификация> <размер> <количество ссылок> */ Tree_p
-init_tree(Tree_p root, char *file_name, int *state) {
+}
+
+/* Считываниет файл с именем file_name  * и записывает в дерево находящееся по указателю Tree_p
+ * Формат файла:
+ * <имя>.<тип> <дата создания> <последняя модификация> <размер> <количество ссылок>
+ * */
+Tree_p initFromFile(Tree_p root, char *file_name, int *state) {
     FILE *file;
     Data_p data;
     char *buf[PCOUNT];
@@ -100,8 +134,9 @@ init_tree(Tree_p root, char *file_name, int *state) {
         printf("Can't open file.");
         return NULL;
     }
-    while (fgets(s, LINESIZE, file)) {
+    while (readLine(s, LINESIZE, file)) {
         i = 0;
+        printf("Read line:%s\n", s);
         for (token = strtok(s, " "); token != NULL; token = strtok(NULL, " ")) {
             if (i < PCOUNT)
                 *(buf + i++) = strdup(token);
@@ -109,20 +144,28 @@ init_tree(Tree_p root, char *file_name, int *state) {
         if (i <= PCOUNT) {
             data = (Data_p) malloc(sizeof(Data));
             data->name = *buf;
+            printf("data name:%s\n", data->name);
             strtok(strdup(*buf), ".");
             token = strtok(NULL, ".");
             data->type = token != NULL ? token : "none";
+            printf("data type:%s\n", data->type);
             data->date = *(buf + 1);
+            printf("data created:%s\n", data->date);
             data->mod = *(buf + 2);
+            printf("data modified:%s\n", data->mod);
             data->size = (unsigned int) atoi(*(buf + 3));
+            printf("data size:%d\n", data->size);
             data->treat = (unsigned int) atoi(*(buf + 4));
-            root = add_tnode(root, data);
+            printf("data treat:%d\n", data->treat);
+            printf("adding data to root\n");
+            root = addTreeNode(root, data);
+            printf("added data to root\n");
             *state = 1;
         }
     }
     return root;
-} /*удаление вершины из дерева  * Если result = 0 - поле не найдено  * Если result = 1 - поле найдено и удалено  */ int
-my_delete_tnode(Tree_root_p root, char *key) {
+} /*удаление вершины из дерева  * Если result = 0 - поле не найдено  * Если result = 1 - поле найдено и удалено  */
+int my_delete_tnode(Tree_root_p root, char *key) {
     int cond, stop = 0, result;
     Tree_p cur, prev, tmp_cur, tmp_prev;
     cur = root->root;
@@ -217,7 +260,7 @@ Tree_p read_tnode(Tree_p root, int *state) {
     scanf("%s", s);
     token = strdup(s);
     data->treat = atoi(token);
-    root = add_tnode(root, data);
+    root = addTreeNode(root, data);
     *state = 1;
     return root;
 }
@@ -229,6 +272,7 @@ int main(int argc, char **argv) {
     int c, flag = 1, result = 0, loaded = 0;
     char line[LINESIZE];
     Tree_root_p troot = (Tree_root_p) malloc(sizeof(Tree_root));
+    troot->root = NULL;
     print_help();
     printf("Выберите требуемое действие:\n");
     while (flag) {
@@ -247,13 +291,13 @@ int main(int argc, char **argv) {
             case 'l': {
                 printf("Введите имя файла:\n");
                 scanf("%s", line);
-                troot->root = init_tree(troot->root, line, &loaded);
+                troot->root = initFromFile(troot->root, line, &loaded);
                 if (loaded) printf("Файл загружен.\n"); else printf("Файл незагружен.\n");
                 break;
             }
             case 'p': {
                 if (loaded) {
-                    printf("Прямой обход дерева:\n");
+                    printf("Концевой обход дерева:\n"); //Заменить на концевой
                     //
                     printf("Name:\t\tType:\tDate:\t\tMod:\t\tSize:\tTreat:\n");
                     printTree(troot->root);
@@ -263,7 +307,7 @@ int main(int argc, char **argv) {
             case 's': {
                 if (loaded) {
                     list = (List_p) malloc(sizeof(List));
-                    infix_travers(troot->root, list);
+                    traverseTree(troot->root, list);
                     bubbleSort(list);
                     printf("Список файлов сортированный по размеру:\n"); //попробывать по имени
                     print_list(list);
@@ -299,7 +343,7 @@ int main(int argc, char **argv) {
 
 void print_help() {
     static char *help[] = {"\nВозможные операции:", "l - загрузить файл в дерево", "a - добавить узел в дерево",
-                           "r - удалить элемент из дерева", "p - напечатать прямой обход дерева",
+                           "r - удалить элемент из дерева", "p - напечатать концевой обход дерева",
                            "s - сортировка обменами по размеру", "f - найти элемент по ключу", "q - выйти",
                            "h - вывод этого сообщения"};
     int i;
