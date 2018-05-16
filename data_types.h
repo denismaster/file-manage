@@ -47,8 +47,8 @@ typedef struct tree_root *Tree_root_p;
 /*конец описания структур данных*/
 /*Описание прототипов функций*/
 /* Функции для работы со списками */
-void add_to_list(List_p, Data_p); //добавить элемент в список
-void print_list(List_p);         //напечатать список
+void addToList(List_p, Data_p); //добавить элемент в список
+void printList(List_p);         //напечатать список
 void delete_list(List_p);         //удалить список
 int remove_list_elem(List_p, int); //удаляет i-ый элемент списка
 void bubbleSort(List_p); //Сортировка вставками списка
@@ -60,12 +60,12 @@ void printTree(Tree_p); //вывод содержимого дерева
 void traverseTree(Tree_p, List_p); //обход дерева и доавлени инфы в список
 Tree_p initFromFile(Tree_p, char *, int *); //считывает файл со списком файлов
 void destroy_tnode(Tree_p); // освобождение памяти выделеной под узел
-int my_delete_tnode(Tree_root_p, char *); // удаление заданного узала из дерева
-Data_p search_tnode(Tree_p, char *); //поиск значения по ключу
-Tree_p read_tnode(Tree_p root, int *state);
+int deleteTreeNode(Tree_root_p, char *); // удаление заданного узала из дерева
+Data_p findTreeNode(Tree_p, char *); //поиск значения по ключу
+Tree_p readTreeNode(Tree_p root, int *state);
 /* Конец объявления функций для работы с деревом */
 /*Функции для работы с данными*/
-void print_data(Data_p); /*вывод содержимого структуры данных*/
+void printData(Data_p); /*вывод содержимого структуры данных*/
 /*конец описания деклараций функций*/
 
 #endif //FILES_DATA_TYPES_H
