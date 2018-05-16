@@ -31,6 +31,7 @@ typedef struct list_node {
 typedef struct list_node *Lnode_p;
 typedef struct list {
     Lnode_p head;
+    Lnode_p tail;
     unsigned size;
 } List;
 typedef struct list *List_p;

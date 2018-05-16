@@ -108,7 +108,7 @@ void printTree(Tree_p node) {
 }
 
 /* функция обхода дерева
- * и добавления результата в списо
+ * и добавления результата в список
  */
 void traverseTree(Tree_p node, List_p list) {
     if (node != NULL) {
@@ -307,14 +307,10 @@ int main(int argc, char **argv) {
             }
             case 's': {
                 if (loaded) {
-                    printf("Создаем список.\n");
                     list = (List_p) malloc(sizeof(List));
                     list->head=NULL;
-                    printf("Заполняем список.\n");
+                    list->tail=NULL;
                     traverseTree(troot->root, list);
-                    printf("Размер списка равен %d\n", list->size);
-                    invprint_list(list);
-                    printf("Сортируем список.\n");
                     bubbleSort(list);
                     printf("Список файлов сортированный по размеру:\n"); //попробывать по имени
                     printList(list);
@@ -364,17 +360,24 @@ void print_help() {
 void addToList(List_p list, Data_p data) {
     Lnode_p tmp;
     if (list->head==NULL) {
+        //заполняем голову списка
         list->head = (Lnode_p) malloc(sizeof(Lnode));
         list->head->next = NULL;
         list->head->prev = NULL;
         list->head->info = data;
+        //Указатель конца указывает пока что на голову
+        list->tail = list->head;
         list->size = 1;
     } else {
         tmp = (Lnode_p) malloc(sizeof(Lnode));
         tmp->info = data;
-        tmp->prev = list->head;
+        //предыдущий элемент равен последнему
+        tmp->prev = list->tail;
         tmp->next = NULL;
-        list->head->next = tmp;
+        //следующий элемент последнего укаываем на новый элемент
+        list->tail->next = tmp;
+        //устанвливаем последний элемент равный нашему
+        list->tail = tmp;
         list->size++;
     }
 }
